@@ -1,0 +1,40 @@
+# Game-mode calls: set_kit, blockable KIT_PICKUP and VEHICLE_ENTER,
+# set_score, end_round. The apitest fixture plugin blocks/logs (tests/plugins).
+rmm plugins load testplugins/apitest
+apitest.blockPickup none
+apitest.blockVehicles none
+apitest.spawnKit none
+apitest.blockExit none
+rmm caps
+rmm events
+.join Alice 1
+.join Bob 2
+.template GermanAssault
+.template Rus_AT
+# the spawn-menu kit is a pickup that can't be blocked
+.spawn 0
+rmm kit Alice GermanAssault
+rmm kit Alice nosuchkit
+# gun game pattern: set_kit from a PLAYER_SPAWN handler
+apitest.spawnKit Rus_AT
+.spawn 1
+.players
+# pickups from the ground: blocked, then allowed (the old kit is dropped)
+rmm spawn GermanAssault 0 50 0
+apitest.blockPickup GermanAssault
+.pickup 1 0x1
+apitest.blockPickup none
+.pickup 1 0x1
+.players
+# vehicles: PRE can keep players out; POST runs once they are in
+apitest.blockVehicles willys
+.vehicle willys 10 0 10
+.enter 0 willys
+.vehicle t34 20 0 20
+.enter 0 t34
+rmm kit Alice Rus_AT
+# score and round end
+rmm score Bob 42
+.players
+rmm endround 2
+rmm endround 1

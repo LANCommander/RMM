@@ -1,0 +1,23 @@
+# Smoke test for rmm_simhost: loads all bundled plugins, simulates a short
+# session and exercises admin commands from the console.
+rmm version
+rmm plugins list
+rmm caps
+.join Alice 1
+.join Bob 2
+.spawn 0
+.spawn 1
+.enter 0 usjep_hmmwv 0
+.kill 1 0 m16
+.exit 0
+.capture "Hotel" 1
+set gravity -5
+gravity
+rmm var sv.serverName
+bots 50% 80
+help
+kick Bob "smoke test"
+.players
+.map gulf_of_oman gpm_cq 64
+rmm plugins reload basecommands
+rmm plugins list

@@ -1,0 +1,37 @@
+# Gun game with blockable map spawners (gungame.mapVehicles), vehicle
+# levels using the map's vehicle spawn points (gungame.spotRange), and the
+# respawn time (gungame.respawnTime) restored when gun game stops.
+# Ladder: tests/gungame/gg_sim.cfg (level 2 is the T34).
+gungame.enabled 1
+gungame.lockWeapons 0
+gungame.mapVehicles 0
+gungame.respawnTime 0
+gungame.spotRange 1000
+rmm caps
+rmm events
+.template Rus_AT
+.template German_Assault
+.template T34 vehicle
+.template Willys vehicle
+.join Alice 1
+.join Bob 2
+.map gg_sim
+.wait 0.5
+# the map's spawners: all blocked; their spots are remembered
+.spawner T34 400 14 400 2 90
+.spawner Boat 100 30 100 1
+# level 2 (T34): it goes to the T34 spawn point, not next to Alice
+.spawn 0
+gg set #0 2
+.wait 0.5
+.players
+# map vehicles allowed again: the spawners spawn
+gungame.mapVehicles 1
+.spawners
+# ...and not: the empty ones go (Alice's T34 stays)
+gungame.mapVehicles 0
+.wait 0.5
+.players
+# gun game off: the server's spawn timing is back
+gungame.enabled 0
+.wait 1.5

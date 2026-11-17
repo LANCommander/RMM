@@ -1,0 +1,47 @@
+# Items: get_items, select_item, remove_item, the blockable weapon
+# switch event (through "rmm items ... lock"), and gungame.lockWeapons.
+rmm caps
+rmm events
+.join Alice 1
+.join Bob 2
+.spawn 0
+.spawn 1
+rmm items @all
+# Alice draws her pistol, then gets locked to the knife and the main weapon:
+# she is made to hold the knife (the first allowed slot)
+.weapon 0 2
+rmm items Alice lock 3,1
+rmm items Alice
+.weapon 0 2
+.weapon 0 3
+rmm items Alice unlock
+.weapon 0 4
+# plugin calls: select, remove (switching away from the held item first)
+rmm items Alice select 2
+rmm items Alice remove 2
+rmm items Alice
+rmm items Alice remove 2
+# gungame.lockWeapons on the gun game test map: level 1 is Rus_AT, weapons=PTRS*,AT_Rocket
+gungame.enabled 1
+gungame.lockWeapons 1
+gungame.knifeCounts 1
+# (no slot 3: the sim then hands out the kit holding the knife, so gun game has
+# to put the PTRS in their hands itself)
+.kititems Rus_AT 1=KnifeAllies 2=Colt 4=GrenadeAllies 5=PTRS_Rifle
+.kititems German_Scout 1=KnifeAxis 2=WalterP38 3=K98Sniper 4=GrenadeAxis
+.template Rus_AT
+.template German_Scout
+.map gg_sim
+.wait 0.5
+.spawn 0
+.spawn 1
+# the level's weapon is put in their hands 1 s after the kit (the client needs the kit first)
+.wait 1.5
+rmm items Bob
+.weapon 1 2
+.weapon 1 4
+.weapon 1 1
+.weapon 1 5
+rmm items Bob
+gungame.lockWeapons 0
+.weapon 1 2

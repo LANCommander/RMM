@@ -1,0 +1,20 @@
+# Chat pacing: a burst of say_all lines is spread out by
+# rmm.chatInterval (default 1.0 s). The first line goes out at once; the rest
+# arrive in order after the .wait, not before the "marker" line.
+.join Alice 1
+.pacing on
+say one
+say two
+say three
+rmm version
+.wait 4
+# a line over BFV's 63-character limit is split at a word boundary, and the
+# second half is paced like any other line
+say the quick brown fox jumps over the lazy dog and keeps running far away
+rmm version
+.wait 2
+# with pacing off (script default) everything is immediate again
+.pacing off
+say four
+say five
+rmm version

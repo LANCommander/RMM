@@ -1,0 +1,66 @@
+# Bots against the simulator's fake AI console (BF1942 command names
+# and output formats). The fake engine reports a simulated crash if the bot
+# list is requested outside co-op, like the real server segfaults.
+rmm.logLevel 0
+.join Alice 1
+rmm caps
+# Conquest: no AI. RMM must refuse without asking for the bot list.
+rmm bots
+.map berlin gpm_coop 0
+# Bots the game adds itself (BOT_ADDED with tag 0, through the 1 s list comparison).
+.aibot Walter 1
+.aibot Ivan 2
+.wait 1.5
+rmm bots
+rmm bots info Walter
+rmm bots behaviours Walter
+rmm bots move Walter 100 20 300 8
+rmm bots info Walter
+rmm bots patrol @bots 10 0 10 20 0 20
+rmm bots order Ivan Fire
+rmm bots info Ivan
+# Unknown names: sent, but the engine ignores them (behaviour stays Fire).
+rmm bots order Ivan Dance
+rmm bots info Ivan
+rmm bots strategy 1
+rmm bots strategy 1 north
+rmm bots strategy 1 nonsense
+rmm bots skill 0.4
+rmm bots skill 7
+# Input control. .botinput = one engine AI tick proposing these inputs;
+# the [sim] line shows what the soldier gets after RMM.
+.botinput Walter throttle=1 fire=1
+rmm bots input Walter
+rmm bots input Walter throttle=-1
+rmm bots control Walter override
+rmm bots input Walter throttle=-1 mouse_look_x=0.25
+.botinput Walter throttle=1 fire=1
+rmm bots control Walter exclusive
+.botinput Walter throttle=1 fire=1
+rmm bots input Walter crouch=1 hold 100
+.wait 0.3
+.botinput Walter throttle=1 fire=1
+rmm bots control Walter engine
+.botinput Walter throttle=1 fire=1
+rmm bots input Walter nonsense=1
+# Two-step add: the fake ai.addBot answers -1 on the first try, like the engine.
+rmm bots add 2 KTMedic Doc at 50 10 60
+rmm bots add 2 KTMedic Doc
+.wait 1.5
+rmm bots info Doc
+rmm bots info Doc_2
+# Refused at once: no such team.
+rmm bots add 3
+# The fake AI refuses "Reject*" names: every ai.addBot attempt fails (ADD_FAILED),
+# and the player createAIPlayer made is kicked again.
+rmm bots add 1 KTScout RejectMe
+.wait 2.5
+.players
+rmm bots remove Walter
+.wait 1.5
+rmm bots
+# The level change drops every AI bot; the next map is not co-op.
+.map strike_at_karkand gpm_cq 32
+.wait 1.5
+rmm bots
+.players

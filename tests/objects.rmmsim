@@ -1,0 +1,27 @@
+# Any world object, spawn/remove, terrain height.
+# Simulator terrain: height = 10 + x / 100. Handles are allocated in order.
+rmm caps
+.join Alice 1
+.spawn 0
+# 0x1 bunker, 0x2 house (far away), 0x3 a jeep beside the bunker
+.static bunker_small 100 10 100
+.static house_big 400 12 50
+.vehicle willys 105 10 95
+.template kit_assault
+.template smoke_marker server
+rmm find
+rmm find bunker*
+# everything within 50 m of the bunker, nearest first: bunker, then the jeep (not the house)
+rmm find * 50 100 10 100
+rmm find * 50 100 10 100 novehicles
+rmm ground 200 0
+# y is a height above the ground with "ground": 0 + (10 + 120/100) = 11.2; yaw 90
+rmm spawn kit_assault 120 0 100 90 ground
+rmm object 0x4
+rmm spawn smoke_marker 0 50 0
+rmm spawn nosuchthing 0 0 0
+rmm remove 0x4
+rmm object 0x4
+rmm find kit*
+# find_vehicles still lists vehicles only
+rmm objects

@@ -1,0 +1,35 @@
+BasedOnStyle: LLVM
+Language: Cpp
+Standard: c++17
+IndentWidth: 4
+ColumnLimit: 120
+AccessModifierOffset: -4
+IndentCaseLabels: true
+IndentPPDirectives: AfterHash
+IndentExternBlock: NoIndent
+NamespaceIndentation: None
+PointerAlignment: Left
+DerivePointerAlignment: false
+# Statement bodies always go on their own line.
+AllowShortBlocksOnASingleLine: Never
+AllowShortCaseLabelsOnASingleLine: false
+AllowShortIfStatementsOnASingleLine: Never
+AllowShortLoopsOnASingleLine: false
+AllowShortFunctionsOnASingleLine: All
+AllowShortLambdasOnASingleLine: All
+AlignConsecutiveMacros: Consecutive
+AlignTrailingComments: true
+SpacesBeforeTrailingComments: 2
+BreakBeforeBraces: Attach
+# Include order is significant (e.g. Windows headers); never reorder.
+SortIncludes: Never
+ReflowComments: false
+# Vertical spacing. tools/format.py adds the rules clang-format lacks
+# (blank line before return/block statements, blank line after a closing brace).
+SeparateDefinitionBlocks: Always
+MaxEmptyLinesToKeep: 1
+KeepEmptyLines:
+  AtStartOfBlock: false
+  AtStartOfFile: false
+  AtEndOfFile: false
+InsertNewlineAtEOF: true

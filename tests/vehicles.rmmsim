@@ -1,0 +1,39 @@
+# Putting players in/out of vehicles, enter/exit reasons, blockable
+# exits and seat switches (F1-F8). The apitest fixture plugin blocks/logs.
+rmm plugins load testplugins/apitest
+apitest.blockPickup none
+apitest.blockVehicles none
+apitest.spawnKit none
+apitest.blockExit none
+rmm caps
+rmm events
+.join Alice 1
+.join Bob 2
+.spawn 0
+.spawn 1
+# a tank: root = seat 0 (driver), then seats 1 and 2
+.vehicle T34 50 0 50
+.seat 0x1 T34_gunner
+.seat 0x1 T34_mg
+rmm objects
+# a plugin seats Alice (first free seat = driver) and Bob (seat 2)
+rmm putin Alice T34
+rmm putin Bob nearest 2
+rmm putin Bob 0x1 0
+rmm object 0x2
+rmm object 0x3
+# keep them in: the use key and F-key switches are blocked...
+apitest.blockExit T34
+.exit 0
+.switch 0 1
+.players
+apitest.blockExit none
+.switch 0 1
+.exit 0
+# ...but never the game's own exits, nor a plugin's
+apitest.blockExit *
+.kill 1 0
+rmm eject Alice
+rmm putin Alice 0x1 1
+rmm eject Alice
+rmm putin Alice 0x1 7

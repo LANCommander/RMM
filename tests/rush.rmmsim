@@ -1,0 +1,86 @@
+# The rush plugin (plugins/rush): stages from a map file, locked points,
+# captures, the fall-back to the next stage, attacker tickets, both endings,
+# and stages made from the map without a file.
+# Stage file: tests/rush/rush_sim.cfg (attackers team 2).
+# Every var this test depends on is set here: changed vars outlive a run (rmm_vars.cfg).
+gungame.enabled 0
+rush.enabled 1
+rush.stageTime 0
+rush.attackers 0
+rush.auto 0
+rush.maps "*"
+rush.modes "*cq*,*conquest*"
+rush.prefix Rush_
+rush.hidePoints 1
+rmm caps
+.cp AxisBase 0 0 0 1 fixed
+.cp AlliedBase 1000 0 1000 2 fixed
+.cp Village 200 0 200 0
+.cp Bridge 300 0 200 1
+.cp Factory 600 0 600 2
+.cp Church 700 0 700 0
+.join Alice 2
+.join Bob 1
+.map rush_sim gpm_cq
+rmm cps
+rush
+# a later stage's point and the bases can't be taken
+.capture Factory 2
+.capture AxisBase 2
+# the attackers neutralise and take Village; it stays theirs
+.capture Village 0
+.capture Village 2
+.capture Village 1
+# Bridge too: the defenders fall back to stage 2, with 2 tickets
+.capture Bridge 2
+.wait 0.3
+rush
+.spawn 0
+.kill 0 1
+rush
+.capture Factory 2
+.capture Church 2
+.wait 0.3
+# round 2: the attackers run out of tickets
+.map rush_sim gpm_cq
+.spawn 0
+.kill 0 1
+.spawn 0
+.kill 0 1
+.spawn 0
+.kill 0 1
+.wait 0.3
+# no stage file and rush.auto 0: an ordinary conquest round
+.map plain_sim gpm_cq
+rush
+# rush.auto 1: stages from the map, the nearest points to the attackers' base first
+rush.auto 1
+.map auto_sim gpm_cq
+rush
+rush skip
+rush
+# Rush points in the map win over everything: Rush_<stage>_<name>, numbered stages
+# first, then unnumbered ones. Team 1 owns them, so team 2 attacks (not rush.attackers).
+rush.attackers 1
+.cp Rush_2_Fort 800 0 800 1
+.cp Rush_1_Hill 300 0 300 1
+.cp Rush_1_Mill 350 0 300 1
+.cp Rush_Depot 900 0 900 0
+.map conv_sim gpm_cq
+rush
+.capture Rush_1_Hill 2
+.capture Rush_1_Mill 2
+.wait 0.3
+# rotation: a CTF round on the same map plays normally, the Rush points neutral and locked
+.map conv_sim gpm_ctf
+rmm cps
+.capture Rush_2_Fort 2
+# ...and so does conquest on a map left out of rush.maps
+rush.maps "other*"
+.map conv_sim gpm_cq
+rush
+# back to the defaults for whatever runs next
+rush.maps "*"
+rush.auto 0
+rush.attackers 0
+rush.stageTime 600

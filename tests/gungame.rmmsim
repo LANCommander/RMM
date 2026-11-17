@@ -1,0 +1,69 @@
+# The gungame plugin (plugins/gungame): kit and vehicle levels, players kept
+# in their vehicle, the explosion when they die in it, knife demotion, only the
+# level's weapon counting, other vehicles and pickups blocked, the win.
+# Ladder: tests/gungame/gg_sim.cfg.
+gungame.enabled 1
+gungame.killsPerLevel 1
+gungame.knifeDemote 1
+gungame.knifeCounts 1
+gungame.strictWeapons 1
+gungame.vehicleExit 0
+gungame.vehicleReenter 1
+gungame.otherVehicles 0
+gungame.pickups 0
+gungame.endRound 1
+rmm caps
+.template Rus_AT
+.template German_Assault
+.template German_Scout
+.template T34 vehicle
+.template Willys vehicle
+.join Alice 1
+.join Bob 2
+.map gg_sim
+gg ladder
+.spawn 0
+.spawn 1
+.players
+# level 1 is the PTRS: a pistol kill doesn't count...
+.kill 1 0 Colt
+.spawn 1
+# ...the PTRS does: level 2 is a vehicle - a T34 appears and she is put in it
+.kill 1 0 PTRS_Projectile
+.wait 0.5
+.players
+gg
+# the use key can't get her out, and nobody else may use other vehicles
+.exit 0
+.vehicle Kubelwagen 300 0 300
+.spawn 1
+.enter 1 Kubelwagen
+rmm spawn German_Assault 0 50 0
+.pickup 1 0x3
+# Bob kills Alice inside her tank: it explodes
+.kill 0 1 AT_Rocket
+.wait 0.3
+.players
+# Bob is on the T34 level now; Alice respawns in her T34 and knifes him
+.wait 0.3
+.spawn 0
+.kill 1 0 Knife
+.wait 0.5
+gg
+# Willys level: kills on foot don't count, from the Willys they do
+rmm eject Alice
+.spawn 1
+.kill 1 0 Colt
+.enter 0 Willys
+.spawn 1
+.kill 1 0
+.spawn 1
+.kill 1 0
+.wait 0.5
+.players
+# the last level has no weapons=: any kill wins
+.spawn 1
+.kill 1 0 Grenade
+gg set Bob 9
+gg set Bob 2
+gungame.enabled 0

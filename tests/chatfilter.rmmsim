@@ -1,0 +1,7 @@
+# The eventmonitor chat filter should block "noob" (chat is blockable in the
+# simulator) and the core should run chat commands.
+.join Alice 1
+.join Bob 2
+.say 1 you noob
+.say 0 !hello
+.say 0 !vehicles
