@@ -124,6 +124,17 @@ dist/rmm/python/rmm_bridge.py
 dist/rmm/configs.example/
 ```
 
+### Releases
+
+Pushing a semver tag (`v1.2.3`, or `v1.2.3-rc.1` for a pre-release) runs
+`.github/workflows/release.yml`. The tag must match the version in `CMakeLists.txt` and
+`src/core/core.h`. The workflow builds and tests on Windows and Linux (32-bit), then
+publishes a GitHub release with, for each platform, `rmm-<ver>-<platform>.zip` (loader,
+core, gamedata, Python bridge, core configs) and one `rmm-plugin-<name>-<ver>-<platform>.zip`
+per bundled plugin (the plugin plus its example configs). Every zip unpacks into the server
+root. To build the same zips locally, run
+`python tools/package_release.py --dist build/dist --version 1.2.3 --platform windows-x86 --out release`.
+
 ## Trying it without a game
 
 ```
