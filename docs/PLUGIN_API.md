@@ -242,6 +242,33 @@ rmm::SayAll("Hello!");
 Capabilities (`RMM_CAP_*`) say what the running game and backend can do.
 Calls that aren't supported return false. `rmm caps` lists them.
 
+A living player's `position` comes with `forward`, the unit vector their
+soldier (or their seat in a vehicle) faces. Both are zero when the player is
+dead or the game can't report them (`RMM_CAP_PLAYER_POSITION`).
+
+### Query replies
+
+```cpp
+// Server browsers and patched clients see \commsport\27800 in the server's query replies.
+rmm::SetQueryRule("commsport", "27800");
+rmm::RemoveQueryRule("commsport");
+```
+
+`game->set_query_rule(self, key, value)` (`RMM_CAP_QUERY_RULES`) adds a
+`\key\value` pair to the server's GameSpy query replies, so a plugin can
+announce a service it runs next to the server. A NULL value removes the key.
+
+- The pair goes before `\final\` in every reply, unless the reply has that key
+  already.
+- Keys are 1-32 and values up to 128 printable ASCII characters, without `\`.
+  A key another plugin set is refused. A plugin's keys go when it unloads.
+- `rmm query` on the console lists the pairs and their plugins.
+- BF1942/BFV: RMM rewrites the server's own UDP sends (the WSOCK32 `sendto`
+  import on Windows; on Linux `librmm.so` exports `sendto`).
+
+The bundled `voicechat` and `fastdl` plugins use this (see
+[Voice chat and FastDL](#voice-chat-and-fastdl)).
+
 ## Support by game
 
 The rest of this guide covers features that depend on the game. On BF1942
@@ -783,6 +810,58 @@ value. Players can use `!gg` (their level), `!gg ladder`, `!gg top` and
 `!gg stuck` (a new vehicle). Admins have `gg set`, `gg restart` and
 `gg reload`.
 
+## Voice chat and FastDL
+
+These two bundled plugins provide the server side of the Battlefield 1942
+patch's voice chat and FastDL downloads. Both announce themselves in the
+server's query replies ([Query replies](#query-replies)), so players don't need
+any extra settings.
+
+**`plugins/voicechat`** runs the voice server of the LANCommander Interposer's
+voice API next to the game server, and mirrors the game into it:
+
+- Every human player is registered under voice id = player id + 1. A client
+  logs in by claiming its own game player, so voice always matches who is on
+  the server.
+- Teams 1 and 2 are server groups ("Axis" and "Allies" on BF1942), which the
+  clients use as the team radio.
+- Living players' `position` and `forward` drive proximity chat and its stereo
+  panning, every `voicechat.updateInterval` seconds. Dead players leave
+  proximity but keep the radio.
+- The voice port goes into the query replies as `\commsport\`.
+
+The voice server is compiled into the plugin. It links the Interposer's
+embeddable static library with only the VOICE feature (see
+[Building with the Interposer](../README.md#building-with-the-lancommander-interposer)),
+so there is no Interposer DLL to deploy. The plugin doesn't attach the
+Interposer: none of its hooks, config files, session log or plugins run in the
+server, only the voice API. Without the Interposer at build time the plugin
+isn't built. Open the voice port (UDP, default 27800).
+
+| Setting | Default | Meaning |
+|---|---|---|
+| `voicechat.enabled` | 1 | Host the voice server |
+| `voicechat.port`, `voicechat.bindAddress` | 27800, all | Where it listens |
+| `voicechat.password` | (none) | Clients must also give this (their `voiceChat.password`) |
+| `voicechat.adminKey` | (none) | Enables the voice server's remote admin channel |
+| `voicechat.maxPlayers`, `voicechat.maxBitrate` | 256, 32000 | Limits |
+| `voicechat.proximityRange`, `voicechat.proximityFullVolumeRange` | 50, 4 | Metres: silent beyond, full volume within |
+| `voicechat.updateInterval` | 0.1 | Seconds between position and team updates |
+| `voicechat.includeBots` | 0 | Register bots too (testing) |
+
+The port, address, password and limits apply when the voice server starts.
+After changing them, run `voiceadmin restart`. `voice` shows how many players
+are connected. `voiceadmin <command>` (flag `h`) runs the voice server's own
+admin commands: `status`, `players`, `groups`, `kick`, `mute`, `limit`,
+`help`.
+
+**`plugins/fastdl`** adds `\fastdlport\`, `\fastdlhost\` and `\fastdlpath\`.
+Patched clients download missing maps and mods from
+`http://<host>:<port><path>/...` before they join. Any web server that serves
+the game folder's layout works; the plugin only announces it. The settings are
+`fastdl.port` (0 = off), `fastdl.host` (empty = the game server's address) and
+`fastdl.path`. `fastdl` shows what is announced.
+
 ## Console commands
 
 | Command | Effect |
@@ -794,6 +873,7 @@ value. Players can use `!gg` (their level), `!gg ladder`, `!gg top` and
 | `rmm plugins pause\|resume <plugin>` | Stop or resume delivering events, commands and timers |
 | `rmm cmds`, `rmm vars [filter]`, `rmm var <name> [value]` | List commands and variables, or show and set one |
 | `rmm events`, `rmm caps`, `rmm settings` | What the running game supports |
+| `rmm query` | The plugins' extra pairs in the server's query replies |
 | `rmm objects [pattern] [roots] [empty]` | Vehicles, with handles, position, velocity, health and occupants |
 | `rmm object <handle> [stop\|pos\|vel\|rot\|damage ...]` | Show a vehicle, or change it (flag `m`) |
 | `rmm find [pattern] [radius [x y z\|@player]] [novehicles] [nosoldiers] [summary]` | Any world object |

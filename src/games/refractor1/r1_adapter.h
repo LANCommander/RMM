@@ -177,6 +177,7 @@ private:
     Core* core_ = nullptr;
     std::map<int32_t, uint32_t> eventFlags_;  // events backed by an installed hook
     bool consoleHooked_ = false;
+    bool queryHooked_ = false;  // the server's sendto rewrites query replies (queryhook)
     static R1Adapter* instance_;
 };
 

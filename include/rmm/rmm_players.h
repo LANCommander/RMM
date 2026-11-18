@@ -40,6 +40,10 @@ typedef struct rmm_player_info {
     char vehicle_template[64];
     rmm_vec3 position;
     int32_t seat; /**< Position in the vehicle (0 = driver), -1 on foot or unknown. */
+    /** Unit vector a living player faces (world axes, Y up): the forward axis
+         *  of their soldier, or of their seat in a vehicle. Zero when dead or
+         *  unknown. Comes with @c position (RMM_CAP_PLAYER_POSITION). */
+    rmm_vec3 forward;
 } rmm_player_info;
 
 /** One item (weapon or tool) a soldier carries (rmm_players_api::get_items). */

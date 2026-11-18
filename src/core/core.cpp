@@ -422,6 +422,7 @@ void Core::ReleaseResources(Plugin* p) {
     vars_.RemoveAll(p);
     timers_.RemoveAll(p);
     botInput_.ReleaseAll(p);
+    query_.RemoveAll(p);
 
     for (auto it = ifaces_.begin(); it != ifaces_.end();)
         it = it->second.owner == p ? ifaces_.erase(it) : std::next(it);

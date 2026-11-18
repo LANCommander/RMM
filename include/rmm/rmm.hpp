@@ -505,6 +505,18 @@ inline bool SetSpawnTiming(const rmm_spawn_timing& t) {
     return RMM_HAS(g_api->game, rmm_game_api, set_spawn_timing) && g_api->game->set_spawn_timing(&t) != 0;
 }
 
+/** Add `\key\value` to the server's query replies (RMM_CAP_QUERY_RULES). */
+inline bool SetQueryRule(const std::string& key, const std::string& value) {
+    return RMM_HAS(g_api->game, rmm_game_api, set_query_rule) &&
+           g_api->game->set_query_rule(g_self, key.c_str(), value.c_str()) != 0;
+}
+
+/** Take @p key back out of the server's query replies. */
+inline bool RemoveQueryRule(const std::string& key) {
+    return RMM_HAS(g_api->game, rmm_game_api, set_query_rule) &&
+           g_api->game->set_query_rule(g_self, key.c_str(), nullptr) != 0;
+}
+
 /* ---- World ---- */
 
 /** The world table, or nullptr if the core doesn't provide one. */

@@ -68,6 +68,7 @@ typedef enum rmm_cap {
     RMM_CAP_CONTROL_POINTS,     /**< rmm_world_api::control_points / get_control_point */
     RMM_CAP_CONTROL_POINT_SET,  /**< rmm_world_api::set_control_point */
     RMM_CAP_CONTROL_POINT_LOCK, /**< rmm_world_api::lock_control_point */
+    RMM_CAP_QUERY_RULES,        /**< rmm_game_api::set_query_rule */
 
     RMM_CAP_COUNT
 } rmm_cap;
@@ -155,6 +156,20 @@ typedef struct rmm_game_api {
          */
     rmm_bool(RMM_CALL* get_spawn_timing)(rmm_spawn_timing* out);
     rmm_bool(RMM_CALL* set_spawn_timing)(const rmm_spawn_timing* timing);
+
+    /* ---- server browser --------------------------------------------------- */
+
+    /**
+     * Add the pair `\key\value` to the server's GameSpy query replies, so
+     * server browsers and patched game clients can read it (e.g. the port of a
+     * service the plugin runs next to the server). @p value NULL removes the
+     * key. Pairs go into every reply that ends with `\final\`, unless the
+     * reply already has that key. A key is 1-32 and a value up to 128
+     * printable ASCII characters, neither containing `\`. Fails for a key
+     * another plugin set. Removed automatically when the plugin unloads.
+     * RMM_CAP_QUERY_RULES.
+     */
+    rmm_bool(RMM_CALL* set_query_rule)(rmm_plugin_t self, const char* key, const char* value);
 } rmm_game_api;
 
 #ifdef __cplusplus

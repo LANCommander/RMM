@@ -1384,3 +1384,21 @@ The server has no "play sound" event: the full list of GameEvents is
     layer: Rush uses them (log: "the map's Rush_ points"). Played as conquest
     with `rush.maps` leaving it out: the Rush points show as neutral flags,
     give no spawns, can't be taken, and the ticket bleed ignores them.
+- 18. Query rules, voice chat and FastDL (Windows and Linux; a client with the
+  BF1942 patch's voice chat; the Interposer library in the server's folder or
+  `rmm/bin`; UDP 27800 open):
+  - [ ] `rmm caps` shows `query_rules`. With `fastdl.port 8080`, a GameSpy
+    `\status\` query to the server (port 23000) has `\commsport\27800` and
+    `\fastdlport\8080` before `\final\`, and the server browser still lists
+    the server. (Windows: the WSOCK32 sendto import, ordinal 20, carries the
+    replies; if not, find the module that sends them.)
+  - [ ] `voice` after joining: 1 of 1 connected; the client found the port by
+    itself (no `voiceChat.port`).
+  - [ ] Two clients: proximity voice fades with distance, pans left/right
+    with facing (`rmm_player_info::forward`; Windows uses
+    getAbsoluteTransformation `+0x3c`), and also works for a gunner seat.
+    Team radio reaches only the team; a dead player hears the radio only.
+  - [ ] `voiceadmin players` / `kick` / `mute`; `voiceadmin restart` keeps
+    clients able to reconnect; `rmm plugins unload voicechat` removes
+    `\commsport\` from the replies.
+  - [ ] FastDL: a client missing a map downloads it from `fastdl.host`.

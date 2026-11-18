@@ -1293,6 +1293,25 @@ rmm_bool RMM_CALL gm_set_spawn_timing(const rmm_spawn_timing* t) {
     return ok;
 }
 
+rmm_bool RMM_CALL gm_set_query_rule(rmm_plugin_t self, const char* key, const char* value) {
+    REQUIRE_SELF(RMM_FALSE);
+
+    if (!key || !C().Game().HasCap(RMM_CAP_QUERY_RULES))
+        return RMM_FALSE;
+
+    std::string err;
+
+    if (!C().Query().Set(self, key, value, err)) {
+        C().Log().Warn("%s: query rule '%s' refused: %s", self->name.c_str(), key, err.c_str());
+
+        return RMM_FALSE;
+    }
+
+    C().Log().Debug("%s: query rule %s = %s", self->name.c_str(), key, value ? value : "(removed)");
+
+    return RMM_TRUE;
+}
+
 rmm_bool RMM_CALL gm_object_template(rmm_object_t o, char* out, size_t cap) {
     std::string s;
 
@@ -1390,7 +1409,8 @@ const rmm_api* BuildApiTables() {
                              gm_say_team_ex,
                              gm_end_round,
                              gm_get_spawn_timing,
-                             gm_set_spawn_timing};
+                             gm_set_spawn_timing,
+                             gm_set_query_rule};
     static rmm_world_api world{sizeof(rmm_world_api), wd_find_vehicles,     wd_is_valid,       wd_get_info,
                                wd_occupants,          wd_set_position,      wd_set_rotation,   wd_set_velocity,
                                wd_find_objects,       wd_spawn_object,      wd_remove_object,  wd_ground_height,

@@ -33,6 +33,7 @@ static const char* kCapNames[RMM_CAP_COUNT] = {
     "bot_strategy",   "bot_skill",       "bot_input",         "set_kit",
     "end_round",      "put_in_vehicle",  "object_damage",     "items",
     "spawn_timing",   "control_points",  "control_point_set", "control_point_lock",
+    "query_rules",
 };
 
 static_assert(sizeof(kCapNames) / sizeof(kCapNames[0]) == RMM_CAP_COUNT, "kCapNames out of sync with rmm_cap");
@@ -1593,7 +1594,7 @@ void RMM_CALL RmmCommand(const rmm_cmd_ctx* ctx, void*) {
     if (sub.empty() || sub == "help") {
         Reply(ctx, "Refractor MultiMod " RMM_VERSION_STRING " - rmm <subcommand>:");
         Reply(ctx, "  version | plugins [list|info|load|unload|reload|pause|resume] | cmds");
-        Reply(ctx, "  vars [filter] | var <name> [value] | settings | events | caps");
+        Reply(ctx, "  vars [filter] | var <name> [value] | settings | events | caps | query");
         Reply(ctx, "  admins reload | bans | exec <cfg file>");
         Reply(ctx, "  objects [pattern] [roots] [empty] | object <handle> [stop|pos|vel|rot|damage ...]");
         Reply(ctx, "  find [pattern] [radius [x y z|@player]] | spawn <template> [x y z|@player] [yaw] [ground]");
@@ -1645,6 +1646,15 @@ void RMM_CALL RmmCommand(const rmm_cmd_ctx* ctx, void*) {
     } else if (sub == "caps") {
         for (int i = 0; i < RMM_CAP_COUNT; ++i)
             Reply(ctx, Format("%-16s %s", kCapNames[i], core.Game().HasCap(i) ? "yes" : "no"));
+    } else if (sub == "query") {
+        std::vector<std::string> owners;
+        auto rules = core.Query().List(&owners);
+
+        if (rules.empty())
+            Reply(ctx, "No query rules.");
+
+        for (size_t i = 0; i < rules.size(); ++i)
+            Reply(ctx, Format("\\%s\\%s  (%s)", rules[i].first.c_str(), rules[i].second.c_str(), owners[i].c_str()));
     } else if (sub == "objects") {
         CmdObjects(ctx);
     } else if (sub == "object") {

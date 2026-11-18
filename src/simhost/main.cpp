@@ -58,6 +58,7 @@ void PrintHelp() {
         "  .pickup <id> <kit handle>   (pick up a kit lying on the ground, e.g. one from rmm spawn)\n"
         "  .weapon <id> <slot>   (weapon key: hold that item)   .kititems <kit> <slot>=<weapon> ...\n"
         "  .spawner <template> <x y z> [team] [yaw]   (map spawner)   .spawners  (respawn what's gone)\n"
+        "  .query [reply]   (a GameSpy query reply as the server would send it, with the plugins' rules)\n"
         "  .wait <seconds>                       .pacing on|off  (chat pacing; scripts start off)\n"
         "  .help   .quit\n"
         "Anything else is a server console line, e.g.:\n"
@@ -181,6 +182,13 @@ bool HandleAction(SimAdapter& sim, const std::string& line, bool& quit) {
                         p.vehicle ? (std::string(" in ") + p.vehicle_template).c_str() : "", p.auth_id,
                         p.kit[0] ? p.kit : "-");
         }
+    } else if (cmd == "query") {  // [reply]: what the send hook makes of a GameSpy query reply
+        std::string reply =
+            a.size() > 1 ? Join(a, 1) : "\\gamename\\bfield1942\\hostport\\14567\\final\\\\queryid\\1.1";
+        char out[2048];
+        int n = Core::Get().Query().Rewrite(reply.data(), static_cast<int>(reply.size()), out, sizeof out);
+        std::printf("query reply: %s%s\n", n ? std::string(out, static_cast<size_t>(n)).c_str() : reply.c_str(),
+                    n ? "" : " (unchanged)");
     } else if (cmd == "wait") {
         double until = plat::MonotonicSeconds() + std::atof(arg(1, "1").c_str());
 

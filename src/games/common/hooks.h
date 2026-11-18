@@ -20,7 +20,8 @@ namespace rmm::hooks {
 
 /// Patch @p importingModule's IAT entry for @p dll!@p func to @p replacement.
 /// @p original receives the previous pointer. importingModule = nullptr means
-/// the main executable. Windows only; returns false elsewhere.
+/// the main executable. @p func "#<n>" matches an import by ordinal n.
+/// Windows only; returns false elsewhere.
 bool PatchImport(void* importingModule, const char* dll, const char* func, void* replacement, void** original);
 
 /// Parse "55 8B EC ?? ?? 83 EC" (?? = wildcard) into bytes + mask.

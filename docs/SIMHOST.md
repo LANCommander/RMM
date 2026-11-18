@@ -56,6 +56,7 @@ add them with `.template`.
 | `.vdamage <handle> <attacker> <amount>` | A vehicle damage event (blockable, editable) |
 | `.drift <seconds>` | Moves every vehicle by its velocity times the given time |
 | `.template <name> [server\|vehicle]` | Makes a template available to `rmm spawn` and `spawn_object`. `server`: not networked. `vehicle`: spawned as a vehicle that `enter_vehicle` accepts. Objects have 1000 health; damage beyond that with `damage_object` destroys a vehicle and kills its occupants |
+| `.query [reply]` | Prints what the send hook makes of a GameSpy query reply (default `\gamename\bfield1942\hostport\14567\final\\queryid\1.1`) with the plugins' query rules |
 | `.spawner <template> <x y z> [team] [yaw]` | Adds a map spawner, which spawns its vehicle at once and raises a blockable `SPAWNER_SPAWN`. Spawn timing (`set_spawn_timing`) is only stored and printed |
 | `.spawners` | Every spawner whose vehicle is gone, or was blocked, tries again |
 

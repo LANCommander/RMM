@@ -47,14 +47,23 @@ bool PatchImport(void* importingModule, const char* dll, const char* func, void*
         auto* orig =
             imp->OriginalFirstThunk ? reinterpret_cast<IMAGE_THUNK_DATA*>(base + imp->OriginalFirstThunk) : thunk;
 
+        // "#20" names an import by ordinal (WSOCK32's are).
+        bool wantOrdinal = func[0] == '#';
+        unsigned long ordinal = wantOrdinal ? std::strtoul(func + 1, nullptr, 10) : 0;
+
         for (; orig->u1.AddressOfData; ++orig, ++thunk) {
-            if (IMAGE_SNAP_BY_ORDINAL(orig->u1.Ordinal))
-                continue;
+            if (IMAGE_SNAP_BY_ORDINAL(orig->u1.Ordinal)) {
+                if (!wantOrdinal || IMAGE_ORDINAL(orig->u1.Ordinal) != ordinal)
+                    continue;
+            } else {
+                if (wantOrdinal)
+                    continue;
 
-            auto* byName = reinterpret_cast<IMAGE_IMPORT_BY_NAME*>(base + orig->u1.AddressOfData);
+                auto* byName = reinterpret_cast<IMAGE_IMPORT_BY_NAME*>(base + orig->u1.AddressOfData);
 
-            if (std::strcmp(reinterpret_cast<const char*>(byName->Name), func) != 0)
-                continue;
+                if (std::strcmp(reinterpret_cast<const char*>(byName->Name), func) != 0)
+                    continue;
+            }
 
             DWORD old;
 

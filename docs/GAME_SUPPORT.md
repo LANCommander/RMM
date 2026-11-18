@@ -70,6 +70,8 @@ Both platforms support:
   `AIPlayer::addInput`.
 - **Console:** running commands and intercepting them, output to the server
   console, and the per-frame tick.
+- **Query replies:** plugin `\key\value` pairs in the GameSpy replies
+  (`set_query_rule`), through the server's own `sendto`.
 
 BF1942 has no squads or revives, so those events are never raised.
 
@@ -95,6 +97,9 @@ be confirmed:
   `set_spawn_timing`; and what each bot input axis does.
 - The weapon reported for roadkills, mines, explosive packs and artillery
   (see [BF1942_WEAPONS.md](BF1942_WEAPONS.md)).
+- Query rules on a real server (that the replies the game sends carry
+  `\commsport\`/`\fastdl*\`), `rmm_player_info::forward`, and voice chat with
+  patched clients through the `voicechat` plugin.
 
 The full list is the live-test checklist at the end of
 [re/bf1942-linux.md](re/bf1942-linux.md).

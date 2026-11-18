@@ -10,6 +10,7 @@
 #include "event_bus.h"
 #include "logger.h"
 #include "plugin_manager.h"
+#include "query_rules.h"
 #include "safe_call.h"
 #include "timer_manager.h"
 #include "var_registry.h"
@@ -63,6 +64,9 @@ public:
 
     /// Who drives which bot, latched/recorded bot input.
     BotControl& BotInput() { return botInput_; }
+
+    /// Plugin pairs for the server's query replies (any thread).
+    QueryRules& Query() { return query_; }
 
     const rmm_api* Api() const;
 
@@ -135,6 +139,7 @@ private:
     ChatQueue chat_;
     BotTracker bots_;
     BotControl botInput_;
+    QueryRules query_;
 
     struct IfaceRec {
         Plugin* owner;

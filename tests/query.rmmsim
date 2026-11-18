@@ -1,0 +1,33 @@
+# Query rules (rmm_game_api::set_query_rule) through the fastdl plugin, and
+# voicechat without its voice library. Changed plugin vars persist between
+# runs (rmm_vars.cfg), so start and end from the defaults.
+fastdl.port 0
+fastdl.host ""
+fastdl.path ""
+rmm caps
+.query
+rmm query
+fastdl
+fastdl.port 8080
+fastdl.path bf1942
+.query
+fastdl
+# A reply that has one of the keys already keeps it; the others are still added.
+.query \hostname\Test\fastdlport\1\final\\queryid\2.1
+# Not a reply (no \final\): every packet but the last of a split reply.
+.query \hostname\Test\queryid\3.1
+fastdl.host dl.example.com
+.query
+rmm query
+fastdl.port 0
+.query
+fastdl.port 8081
+rmm plugins unload fastdl
+.query
+rmm query
+voice
+voiceadmin status
+rmm plugins load fastdl
+fastdl.port 0
+fastdl.host ""
+fastdl.path ""

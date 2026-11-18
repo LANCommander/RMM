@@ -138,6 +138,7 @@ int SimAdapter::CapOverride(int32_t cap) const {
         case RMM_CAP_CONTROL_POINTS:
         case RMM_CAP_CONTROL_POINT_SET:
         case RMM_CAP_CONTROL_POINT_LOCK:
+        case RMM_CAP_QUERY_RULES:
             return 1;
         default:
             return -1;
@@ -165,6 +166,8 @@ bool SimAdapter::GetPlayer(rmm_player_t id, rmm_player_info& out) {
         return false;
 
     out = it->second;
+    // Sim soldiers face +Z while alive.
+    out.forward = out.is_alive ? rmm_vec3{0, 0, 1} : rmm_vec3{0, 0, 0};
 
     return true;
 }

@@ -1,0 +1,20 @@
+{
+  "name": "refractor-multimod",
+  "description": "Only used when the LANCommander Interposer is embedded (RMM_INTERPOSER_DIR): the libraries of its embeddable library with the VOICE feature.",
+  "dependencies": [],
+  "features": {
+    "interposer": {
+      "description": "The embedded LANCommander Interposer (voicechat plugin)",
+      "dependencies": [
+        {
+          "name": "minhook",
+          "platform": "windows"
+        },
+        "yaml-cpp",
+        "enet",
+        "opus",
+        "miniaudio"
+      ]
+    }
+  }
+}

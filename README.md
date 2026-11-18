@@ -72,7 +72,7 @@ src/simhost/        rmm_simhost: runs the core and plugins against a simulated s
 python/rmm/         rmm_bridge.py, the Python side of the BF2/2142 backend
 gamedata/           Per-game commands, settings and addresses
 configs/            Example configs (core.cfg, admins.cfg, plugins/*.cfg)
-plugins/            Bundled plugins: hello (C), basecommands, eventmonitor, gungame, rush
+plugins/            Bundled plugins: hello (C), basecommands, eventmonitor, gungame, rush, voicechat, fastdl
 tests/              Simulator test scripts run by CTest
 docs/               Architecture, plugin guide, game support, reverse-engineering notes
 ```
@@ -98,6 +98,25 @@ cmake --build build && ctest --test-dir build
 ```
 
 The tests run the bundled plugins in the simulator.
+
+### Building with the LANCommander Interposer
+
+The `voicechat` plugin embeds the voice server of the
+[LANCommander Interposer](https://github.com/LANCommander/LANCommander.Interposer):
+its embeddable static library, built with only the features listed in
+`RMM_INTERPOSER_FEATURES` (default `VOICE`). Point `RMM_INTERPOSER_DIR` at a
+checkout. Its libraries (yaml-cpp, ENet, Opus, miniaudio, MinHook) come from
+vcpkg through `vcpkg.json`, so set `VCPKG_ROOT` (or `CMAKE_TOOLCHAIN_FILE`):
+
+```powershell
+$env:VCPKG_ROOT = "C:\vcpkg"
+cmake -S . -B build -A Win32 -DRMM_INTERPOSER_DIR=C:/src/LANCommander.Interposer
+```
+
+The triplet is `x86-windows-static` or `x86-linux`, with the Interposer's own
+triplets. Configure a fresh build directory: CMake reads the toolchain only
+on the first configure. Without `RMM_INTERPOSER_DIR` everything else builds
+and `voicechat` is skipped.
 
 On Linux, `librmm.so` links its C++ runtime statically and exports none of its
 own symbols, because it is preloaded into servers that use the much older

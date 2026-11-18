@@ -5,6 +5,7 @@
 #include "../../core/core.h"
 #include "../../core/platform.h"
 #include "../common/hooks.h"
+#include "../common/query_hook.h"
 
 #include <cstdlib>
 
@@ -31,12 +32,22 @@ bool R1Adapter::Attach(Core& core, std::string& err) {
     if (!ok) {
         hooks::RemoveAllDetours();
         instance_ = nullptr;
+
+        return false;
     }
 
-    return ok;
+    std::string queryErr;
+    queryHooked_ = queryhook::Install(queryErr);
+
+    if (!queryHooked_)
+        core.Log().Warn("Query replies can't carry plugin rules: %s", queryErr.c_str());
+
+    return true;
 }
 
 void R1Adapter::Detach() {
+    queryhook::Remove();
+    queryHooked_ = false;
     hooks::RemoveAllDetours();
     instance_ = nullptr;
 }

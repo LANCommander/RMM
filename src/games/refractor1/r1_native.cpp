@@ -20,6 +20,7 @@
 #include "r1_abi.h"
 
 #include <algorithm>
+#include <cmath>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
@@ -658,6 +659,30 @@ bool CanRotate() {
         return true;
 #endif
     return g_setRotation && g_setTransformation;
+}
+
+// The forward axis of an object's absolute matrix. The matrix is row major: the
+// right, up and forward axes, then the position.
+bool AbsoluteForward(uintptr_t object, rmm_vec3& out) {
+    if (!g_objectModel)
+        return false;
+
+    using GetMatFn = const float*(R1_THIS*)(uintptr_t self);
+    auto getMat = VirtualAt<GetMatFn>(object, kVtGetTransformation);
+    const float* m = getMat ? getMat(object) : nullptr;
+    float f[3];
+
+    if (!m || !elf::SafeRead(m + 8, f, sizeof f))
+        return false;
+
+    float len = std::sqrt(f[0] * f[0] + f[1] * f[1] + f[2] * f[2]);
+
+    if (!(len > 1e-4f) || !std::isfinite(len))
+        return false;
+
+    out = rmm_vec3{f[0] / len, f[1] / len, f[2] / len};
+
+    return true;
 }
 
 // geom::ITerrain* geom::terrainBase; getHeight(float x, float z) const is
@@ -3085,6 +3110,8 @@ int R1Adapter::CapOverride(int32_t cap) const {
             return g_cpLayoutKnown && ObjectManager() && g_cpGotControl && g_cpLostControl ? 1 : 0;
         case RMM_CAP_CONTROL_POINT_LOCK:
             return g_cpLayoutKnown && ObjectManager() && g_cpFrameUpdate ? 1 : 0;
+        case RMM_CAP_QUERY_RULES:
+            return queryHooked_ ? 1 : 0;
         // -1 below: fall back to whatever the gamedata offers
         case RMM_CAP_SET_KIT:
             return g_createObject && g_handlePickupAddr && g_destroyObject && g_getTemplateByName &&
@@ -4645,8 +4672,10 @@ bool R1Adapter::ReadPlayerAt(uintptr_t p, rmm_player_info& out) {
     if (out.is_alive) {
         uintptr_t controlled = vehicle ? vehicle : soldier;
 
-        if (controlled)
+        if (controlled) {
             AbsolutePosition(controlled, out.position);
+            AbsoluteForward(controlled, out.forward);
+        }
     }
 
     out.seat = -1;
